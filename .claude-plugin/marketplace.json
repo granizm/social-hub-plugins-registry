@@ -1,0 +1,16 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "social-hub-plugins-registry",
+  "description": "Social Hub (https://social-hub.granizm.net) を Claude Code から使うための plugin registry",
+  "owner": {
+    "name": "granizm"
+  },
+  "plugins": [
+    {
+      "name": "social-hub-api",
+      "description": "Social Hub の API を API トークンで読み、接続済み SNS (LINE など) の profile 状態・ログイン確認・トーク一覧・直近に受け取ったメッセージを表にまとめる skill。読み取り専用。",
+      "source": "./plugins/social-hub-api",
+      "enabled": true
+    }
+  ]
+}
