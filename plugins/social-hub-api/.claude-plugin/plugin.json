@@ -1,0 +1,10 @@
+{
+  "name": "social-hub-api",
+  "version": "0.1.0",
+  "description": "Social Hub の API を API トークンで読み、接続済み SNS (LINE など) の profile 状態・ログイン確認・トーク一覧・直近に受け取ったメッセージを表にまとめる skill。読み取り専用。",
+  "author": {
+    "name": "granizm"
+  },
+  "keywords": ["social-hub", "line", "sns", "api-token", "messages"],
+  "license": "MIT"
+}
