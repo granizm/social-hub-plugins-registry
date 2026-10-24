@@ -17,15 +17,37 @@ API トークン ─▶ https://social-hub.granizm.net/api/v1/*   (web の中継
 
 トークンの発行者 (ログインした本人) のアカウントだけが見える。別アカウントは別トークン。
 
-## 準備
+## 準備 (トークンの置き場所)
 
-| 変数 | 内容 |
-|---|---|
-| `SOCIAL_HUB_API_TOKEN` | API トークン (必須)。代わりに `SOCIAL_HUB_API_TOKEN_FILE` にファイルパスでもよい |
-| `SOCIAL_HUB_API_URL` | 既定 `https://social-hub.granizm.net/api/v1` |
-| `SOCIAL_HUB_PROFILE` | 対象 profile (カンマ区切り)。未指定なら全 profile |
+一度 `login` すれば、以後は設定不要。
 
-トークンが無いときは、ユーザーに「Social Hub の /account で API トークンを発行・表示し、`export SOCIAL_HUB_API_TOKEN=...` してください」と頼む。**トークンの値を自分で探し回らない** (サーバの DB や秘密情報ストアから取り出さない)。
+```bash
+<この skill のディレクトリ>/scripts/sh-api.sh login     # トークンを貼り付け (表示されない) → 使えるか確かめてから保存
+```
+
+保存先は `${XDG_CONFIG_HOME:-~/.config}/social-hub/credentials` (INI、権限 600。緩いと読まない)。
+
+```ini
+[default]
+token = <API トークン>
+# url = https://social-hub.granizm.net/api/v1   (別環境のときだけ)
+
+[work]            # 別アカウント。SOCIAL_HUB_ACCOUNT=work で使う / login --account work で保存
+token = ...
+```
+
+トークンは次の順で探す (先に見つかったものを使う)。`where` でどこから読んだかを確かめられる (値は出ない)。
+
+| 順 | 置き場所 | 向いている場面 |
+|---|---|---|
+| 1 | 環境変数 `SOCIAL_HUB_API_TOKEN` | 一時的に別トークンで試す |
+| 2 | 環境変数 `SOCIAL_HUB_API_TOKEN_FILE` (トークンだけのファイル) | CI・secret のマウント |
+| 3 | カレントディレクトリの `.env` の `SOCIAL_HUB_API_TOKEN=` (読むだけ。実行しない) | repo ごとに変える。`.gitignore` 済みか確認すること |
+| 4 | `~/.config/social-hub/credentials` の `[${SOCIAL_HUB_ACCOUNT:-default}]` | 普段使い (推奨) |
+
+URL も同じ順 (`SOCIAL_HUB_API_URL` / `.env` / credentials の `url`)。既定は `https://social-hub.granizm.net/api/v1`。`SOCIAL_HUB_PROFILE` で対象 profile を絞れる (未指定なら全 profile)。
+
+トークンが見つからないときは、ユーザーに「Social Hub の /account で API トークンを発行・表示し、ターミナルで `sh-api.sh login` を実行して貼り付けてください」と頼む (トークンをチャットに貼らせない)。**トークンの値を自分で探し回らない** (サーバの DB や秘密情報ストアから取り出さない)。
 
 ## 使い方
 
@@ -44,7 +66,7 @@ $S get '/users/search?query=foo'  # その他の GET (JSON)
 
 ## 報告の形 (必ずこの項目を出す)
 
-1. **経路**: 使った URL とトークンの長さ・先頭 3 文字 (値は出さない)
+1. **経路**: 使った URL とトークンの長さ・先頭 3 文字・読んだ場所 (値は出さない)
 2. **profile 表**: profile / platform / 状態 (`ready` など) / verify の結果 / 表示名
 3. **件数**: profile ごとのトーク一覧の件数 (`check` の「トーク件数」。省略しない)
 4. **メッセージ表**: 日時 (JST) / 種類 (1対1・グループ) / 相手 / 本文 (長文は 60 文字で切る)
